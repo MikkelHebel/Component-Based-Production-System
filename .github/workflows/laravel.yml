@@ -1,0 +1,64 @@
+name: Laravel CI with Docker Compose
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    
+    env:
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_DB_PASSWORD }} 
+      POSTGRES_USER: postgres
+      POSTGRES_DB: mes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env
+        run: |
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_DB_PASSWORD }}" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_DB=mes" >> .env
+     
+      - name: Start Database Container
+        run: docker compose -f docker-compose.yml up -d db
+
+      - name: Wait for DB to be ready
+        run: |
+          ATTEMPTS=0
+          until docker exec Postgres pg_isready -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }}; do
+            if [ $ATTEMPTS -ge 15 ]; then
+              echo "Timeout: PostgreSQL container failed to start."
+              docker logs Postgres
+              exit 1
+            fi
+            echo "Waiting for Postgres... Attempt $((ATTEMPTS + 1))/15"
+            sleep 2
+            ATTEMPTS=$((ATTEMPTS + 1))
+          done
+          echo "PostgreSQL is ready!"
+
+      - name: Prepare and Start Laravel Container (Bypass Entrypoint)
+        run: docker compose -f docker-compose.yml run -d --rm --entrypoint sh --name Laravel web
+
+      - name: Inject DB Config and Run Tests
+        run: |
+          docker exec Laravel composer install --no-interaction --prefer-dist --ignore-platform-reqs
+
+          docker exec Laravel npm install
+          docker exec Laravel npm run build
+          
+          docker exec Laravel cp .env.example .env
+          echo "DB_PASSWORD=${{ secrets.POSTGRES_DB_PASSWORD }}" | docker exec -i Laravel tee -a .env > /dev/null
+          
+          docker exec Laravel php artisan key:generate
+          docker exec Laravel php artisan migrate:fresh --force
+          docker exec Laravel php artisan db:seed --force
+          
+          docker exec Laravel php artisan test
+
+      - name: Stop Containers
+        if: always()
+        run: docker compose down -v
