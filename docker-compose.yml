@@ -1,0 +1,71 @@
+services:
+  # Machines
+  st4-warehouse:
+    image: thmork/st4-warehouse:latest
+    ports:
+      - 8081:80
+    networks:
+      - machines
+
+  st4-agv:
+    image: thmork/st4-agv:latest
+    ports:
+      - 8082:80
+    networks:
+      - machines
+
+  st4-assembly-station:
+    image: thmork/st4-assemblystation:latest
+    environment:
+      MQTT_TCP_CONNECTION_HOST: "mqtt"
+      MQTT_TCP_CONNECTION_PORT: 1883
+    networks:
+      - machines
+  
+  # MQTT Broker
+  mqtt:
+    image: thmork/st4-mqtt:latest
+    ports:
+      - 1884:1883
+      - 9001:9001
+    networks:
+      - machines
+
+  # Web + Database
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.laravel
+    container_name: web
+    ports:
+      - 8000:8000
+    volumes:
+      - ./webapp:/var/www/html
+      - ./.env:/var/www/html/.env
+    networks:
+      - internal
+      - machines
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: postgres:18.0
+    container_name: Postgres
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 5433:5432
+    volumes:
+      - pgdata:/var/lib/postgresql
+    networks:
+      - internal
+
+volumes:
+  pgdata:
+
+networks:
+  internal:
+  machines:
