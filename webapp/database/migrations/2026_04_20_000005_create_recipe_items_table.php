@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('recipe_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('recipe_id')->constrained();
+            $table->foreignId('recipe_step_id')->constrained();
             $table->foreignId('item_id')->constrained();
             $table->unsignedInteger('quantity');
         });
