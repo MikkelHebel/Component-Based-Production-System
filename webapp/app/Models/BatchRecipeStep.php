@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class RecipeItem extends Pivot
+class ProductionStep extends Pivot
 {
     //
 }
