@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "TGjnknoEHJo=",
+  "success": true,
+  "projectFilePath": "/home/mikkel/Component-Based-Production-System/orchestrator/Orchestrator.Api/Orchestrator.Api.csproj",
+  "expectedPackageFiles": [
+    "/home/mikkel/.nuget/packages/microsoft.aspnetcore.openapi/9.0.12/microsoft.aspnetcore.openapi.9.0.12.nupkg.sha512",
+    "/home/mikkel/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}
