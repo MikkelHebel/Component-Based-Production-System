@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class RecipeStep extends Model
 {
     protected $fillable = [
-        'recipe_id',
-        'asset_id',
         'step_order',
         'command',
         'parameters',
