@@ -1,0 +1,6 @@
+@CPS_Whisperer_HostAddress = http://localhost:5159
+
+GET {{CPS_Whisperer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
