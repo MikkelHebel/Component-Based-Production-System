@@ -20,9 +20,10 @@ public class ComponentRegistry
         _logger.LogInformation($"Component {component.ComponentId} has been added to registry");
     }
 
-    public void DeRegister(IComponent component) {
-        if (!_components.ContainsKey(component.ComponentId)) {
-            _logger.LogWarning($"Component {component.ComponentId} is not registered");
+    public void DeRegister(string path) {
+        var component = _components.Values.FirstOrDefault(c => c.DLLPath == path);
+        if (component == null) {
+            _logger.LogWarning($"No component found for path {path}");
             return;
         }
         _components.Remove(component.ComponentId);
