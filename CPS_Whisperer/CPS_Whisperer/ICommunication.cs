@@ -1,6 +1,7 @@
 interface ICommunication{
-    public MachineState state {get; set;} //can't be private
+    MachineState State {get; set;} //can't be private
 
-    public int Command(string cmd);
-    public string Status();
+    async Task Command(string cmd){}
+    //async Task Command(T cmd); //object or something instead of string??
+    string Status();
 }

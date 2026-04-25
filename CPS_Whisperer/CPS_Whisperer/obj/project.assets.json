@@ -976,11 +976,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/soren/Desktop/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
+      "projectUniqueName": "/Users/soren/Desktop/proj/Component-Based-Production-System/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
       "projectName": "CPS_Whisperer",
-      "projectPath": "/Users/soren/Desktop/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
+      "projectPath": "/Users/soren/Desktop/proj/Component-Based-Production-System/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
       "packagesPath": "/Users/soren/.nuget/packages/",
-      "outputPath": "/Users/soren/Desktop/CPS_Whisperer/CPS_Whisperer/obj/",
+      "outputPath": "/Users/soren/Desktop/proj/Component-Based-Production-System/CPS_Whisperer/CPS_Whisperer/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/soren/.nuget/NuGet/NuGet.Config"

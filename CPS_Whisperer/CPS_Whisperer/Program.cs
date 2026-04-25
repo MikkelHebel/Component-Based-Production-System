@@ -1,3 +1,4 @@
+using System.Reflection;
 using MQTTnet;
 using MQTTnet.Client;
 // main method for only for testing
@@ -5,34 +6,48 @@ class Program
 {
     static async Task Main(string[] args) {
 
-    Console.WriteLine("  AGV");
-    AGV agv = AGV.Instance;
-    try {
-      string putResponse = await agv.Execute("MoveToAssemblyOperation", 1);
-      Console.WriteLine($"PUT response: {putResponse}");
-      await agv.Execute("MoveToAssemblyOperation", 1);
-      string getResponse = await agv.GetStatus();
-      Console.WriteLine($"GET response: {getResponse}");
-      await agv.GetStatus();
-    } 
-    catch (HttpRequestException e) {
-        Console.WriteLine($"Request failed: {e.Message}");
-        Console.WriteLine($"Status code: {e.StatusCode}");
-    }
+        Console.WriteLine("  AGV");
+        await AGV.Instance.Command("MoveToAssemblyOperation.1");
+        // AGV agv = AGV.Instance;
+        // try {
+        //   string putResponse = await agv.Execute("MoveToAssemblyOperation", 1);
+        //   Console.WriteLine($"PUT response: {putResponse}");
+        //   await agv.Execute("MoveToAssemblyOperation", 1);
+        //   string getResponse = await agv.GetStatus();
+        //   Console.WriteLine($"GET response: {getResponse}");
+        //   await agv.GetStatus();
+        // } 
+        // catch (HttpRequestException e) {
+        //     Console.WriteLine($"Request failed: {e.Message}");
+        //     Console.WriteLine($"Status code: {e.StatusCode}");
+        // }
 
-    //------------------------
-    Console.WriteLine("\n  Warehouse");
-    await Warehouse.Instance.Run();
+        //------------------------
+        Console.WriteLine("\n  Warehouse");
+        await Warehouse.Instance.Command("1.ItemA");
+        
+        //await Warehouse.Instance.Run();
 
 
-    //------------------------
-    Console.WriteLine("\n  ASS station");
-    await AssemblyStation.Instance.Connect();
-    await AssemblyStation.Instance.Subscribe();
-    await AssemblyStation.Instance.Publish();
+        //------------------------
+        Console.WriteLine("\n  ASS station");
+        Console.WriteLine("Write ProcessID: ");
+        int processID = Convert.ToInt32(Console.ReadLine());
+        await AssemblyStation.Instance.Connect();
+        await AssemblyStation.Instance.Subscribe();
+        await AssemblyStation.Instance.Command(processID);
+        await Warehouse.Instance.CheckInventory();
+        while (true)
+        {
+            Console.ReadLine(); 
+            Console.WriteLine("AGV: " + AGV.Instance.Status());
+            Console.WriteLine("WAREHOUSE: " + Warehouse.Instance.Status());
+            Console.WriteLine("ASSEMBLY STATION: " + AssemblyStation.Instance.Status());
+            Console.WriteLine("ASSEMBLY STATION HEALTH: " + AssemblyStation.Instance.CheckHealth());
+        }
     }
 }
-
+ 
 
 
 

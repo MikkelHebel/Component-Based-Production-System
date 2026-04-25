@@ -1,48 +1,77 @@
-using System.Reflection;
+using Newtonsoft.Json.Linq;
+
 class AGV : ICommunication {
-  private HttpClient client;
+  private string _jsonString;
+  private HttpClient _client;
   private static readonly Lazy<AGV> agv_instance =
     new Lazy<AGV>(() => new AGV());
 
   private AGV(){ // singleton 
-    client = new HttpClient();
-    client.BaseAddress = new Uri("http://localhost:8082/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    _client = new HttpClient();
+    _client.BaseAddress = new Uri("http://localhost:8082/");
+    _client.DefaultRequestHeaders.Add("Accept", "application/json");
   }
   
   public static AGV Instance { get { return agv_instance.Value; } } // get instance of singleton
   //public int battery; //eh?
-  public MachineState state {get; set;}
-  public int Command(string cmd) {
-      MethodInfo mi = this.GetType().GetMethod(cmd); //substring for parameter(s)?
-      mi.Invoke(this, null); //Invoke the method (null means no parameter for the method call, or you can pass array of parameters)
-      return 0; //return value?
+  
+  public MachineState State {get; set;}
+
+  public async Task Command(string cmd){
+    string p = cmd.Substring(0, cmd.IndexOf("."));
+    int s = Convert.ToInt32(cmd.Substring(cmd.IndexOf(".")+1));
+    await Execute(p,s);
+
+    Console.WriteLine(p + s); //for purpose of showing output, delete
   }
 
-  public string Status()
+  public string Status() {
+    UpdateState();
+    
+    try {
+      var obj = JObject.Parse(_jsonString);
+      int s = Convert.ToInt32(obj.GetValue("state"));
+      switch (s)
+            {
+                case 0: State = MachineState.Idle; break;
+                case 1: State = MachineState.Executing; break;
+                case 2: State = MachineState.Charging; break;
+                default: break;
+            }
+            return State.ToString();
+        }
+        catch (Exception) {
+            return "NO STATE";
+        }
+    
+  }
+
+  private async void UpdateState()
   {
-    return "bleh";
-  }
-
-  public async Task<string> GetStatus() {
-    using HttpResponseMessage response = await client.GetAsync("v1/status");
+    using HttpResponseMessage response = await _client.GetAsync("v1/status");
     response.EnsureSuccessStatusCode();
 
-    return await response.Content.ReadAsStringAsync();
+    _jsonString = await response.Content.ReadAsStringAsync();
   }
 
   // state = 2 to load, 3 to execute on actual agv
-  public async Task<string> Execute(string commandName, int state)
+  public async Task<string> Execute(string programName, int state)
   {
     var body = new Dictionary<string, object>
     {
-      {"Program name", commandName},
+      {"Program name", programName},
       {"state", state}
     };
 
-    using HttpResponseMessage response = await client.PutAsJsonAsync("v1/status", body);
+    using HttpResponseMessage response = await _client.PutAsJsonAsync("v1/status", body);
     response.EnsureSuccessStatusCode();
 
     return await response.Content.ReadAsStringAsync();
   }
+
+   // public async Task<string> GetStatus() {
+  //   using HttpResponseMessage response = await _client.GetAsync("v1/status");
+  //   response.EnsureSuccessStatusCode();
+  //   return await response.Content.ReadAsStringAsync();
+  // }
 }

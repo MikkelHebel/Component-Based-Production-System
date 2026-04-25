@@ -1,28 +1,13 @@
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Protocol;
-using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 class AssemblyStation : ICommunication {
-    public MachineState state {get; set;}
-
-    public int Command(string cmd) {
-        MethodInfo mi = this.GetType().GetMethod(cmd); //substring for parameter(s)?
-        mi.Invoke(this, null); //Invoke the method (null means no parameter for the method call, or you can pass array of parameters)
-        return 0; //return value?
-    }
-
-    public string Status() {
-        return "bich";
-    }
-
-    public string CheckHealth(){
-        return "biiiich";
-    }
-
-    //-----------------------
-
+    private JObject _mqttMsg;
+    private string _mqttString;
+    private string _health;
     private MqttFactory _mqttFactory = new MqttFactory();
     private IMqttClient _mqttClient;
     private MqttClientOptions _mqttClientOptions;
@@ -36,47 +21,24 @@ class AssemblyStation : ICommunication {
         // Setting up subscriber handler pre connection to ensure no messages are lost
         // Lambda used as an anonymous function. Circumvents defining unnecessary methods elsewhere
         _mqttClient.ApplicationMessageReceivedAsync += e => {
-            Console.WriteLine($"MQTT: {e.ApplicationMessage.ConvertPayloadToString()}");
+            _mqttString = e.ApplicationMessage.ConvertPayloadToString();
+            //Console.WriteLine(_mqttString);
+            UpdateHealth();
+
+            //below doesnt work for checkhealth as it's not correct JSON, but a string
+            _mqttMsg = JsonConvert.DeserializeObject<JObject>(
+               e.ApplicationMessage.ConvertPayloadToString())!;
+            
             return Task.CompletedTask; 
         };
     }
 
     public static AssemblyStation Instance { get { return _as_instance.Value; } }
-
     
+    public MachineState State {get; set;}
 
-    public async Task Connect() { // Connecting to client to broker
-        await _mqttClient.ConnectAsync(_mqttClientOptions, CancellationToken.None);
-        Console.WriteLine("The MQTT client is connected.");
-    }
-
-    public async Task Subscribe() { // Subscribing to the topics
-        // MqttClientSubscribeOptions mqttSubscribeHealth = _mqttFactory.CreateSubscribeOptionsBuilder()
-        //     .WithTopicFilter("emulator/checkhealth").Build();
-        // MqttClientSubscribeOptions mqttSubscribeStatus = _mqttFactory.CreateSubscribeOptionsBuilder()
-        //     .WithTopicFilter("emulator/status").Build();
-        // MqttClientSubscribeOptions mqttSubscribeOperation = _mqttFactory.CreateSubscribeOptionsBuilder()
-        //     .WithTopicFilter("emulator/operation").Build();
-
-        // await _mqttClient.SubscribeAsync(mqttSubscribeHealth, CancellationToken.None);
-        // await _mqttClient.SubscribeAsync(mqttSubscribeStatus, CancellationToken.None);
-        // await _mqttClient.SubscribeAsync(mqttSubscribeOperation, CancellationToken.None);
-        //  Console.WriteLine("The MQTT client subscribed to topics");
-
-        Console.WriteLine("Connected.");
-        SubscribeToTopic("emulator/status");
-        SubscribeToTopic("emulator/checkhealth");
-    }
-
-    public async Task Disconnect() {
-        MqttClientDisconnectOptions mqttClientDisconnectOptions = _mqttFactory.CreateClientDisconnectOptionsBuilder().Build();
-
-        await _mqttClient.DisconnectAsync(mqttClientDisconnectOptions, CancellationToken.None);
-        Console.WriteLine("The MQTT client has been disconnected");
-    }
-
-    public async Task Publish(){
-        var msg = new MQTTMessage{ ProcessID = 1000 };
+    public async Task Command(int cmd) {
+        var msg = new MQTTMessage{ ProcessID = cmd };
 
         var json = JsonConvert.SerializeObject(msg);
 
@@ -87,24 +49,77 @@ class AssemblyStation : ICommunication {
             .Build();
 
         await _mqttClient.PublishAsync(op);
+        //return value?
     }
 
-
-        public async void SubscribeToTopic(string input)
-        {
-            //printout
-            Console.WriteLine("Subscribing to : " + input);
-
-            //define topics
-            var topic = new MqttTopicFilterBuilder()
-                .WithTopic(input)
-                .Build();
-
-            //subscribe
-            await _mqttClient.SubscribeAsync(topic);
+    public string Status() {
+        try {
+            int s = Convert.ToInt32(JObject.FromObject(_mqttMsg).GetValue("State"));
+            switch (s)
+            {
+                case 0: State = MachineState.Idle; break;
+                case 1: State = MachineState.Executing; break;
+                case 2: State = MachineState.Error; break;
+                default: break;
+            }
+            return State.ToString();
         }
-}
-    public class MQTTMessage
-    {
-        public int ProcessID { get; set; }
+        catch (Exception) {
+            return "NO STATE";
+        }
     }
+
+    public string CheckHealth() {
+        if (_health != null){
+            return _health;
+        }
+        else {
+            return "No operation has finished";
+        }
+    }
+    
+
+    public async Task Connect() { // Connecting to client to broker
+        await _mqttClient.ConnectAsync(_mqttClientOptions, CancellationToken.None);
+        Console.WriteLine("The MQTT client is connected.");
+    }
+
+    public async Task Subscribe() { // Subscribing to the topics
+        await SubscribeToTopic("emulator/status");
+        await SubscribeToTopic("emulator/checkhealth");
+    }
+
+    public async Task Disconnect() {
+        MqttClientDisconnectOptions mqttClientDisconnectOptions = _mqttFactory.CreateClientDisconnectOptionsBuilder().Build();
+
+        await _mqttClient.DisconnectAsync(mqttClientDisconnectOptions, CancellationToken.None);
+        Console.WriteLine("The MQTT client has been disconnected");
+    }
+
+
+    public async Task SubscribeToTopic(string input)
+    {
+        //printout
+        Console.WriteLine("Subscribing to: " + input);
+
+        //define topics
+        var topic = new MqttTopicFilterBuilder()
+            .WithTopic(input)
+            .Build();
+
+        //subscribe
+        await _mqttClient.SubscribeAsync(topic);
+    }
+
+    private void UpdateHealth(){
+        if (_mqttString.Contains("true")){
+            _health = "Healthy";
+        }
+        if (_mqttString.Contains("false")){
+            _health = "Unhealthy";
+        }
+    }
+}
+public class MQTTMessage {
+    public int ProcessID { get; set; }
+}

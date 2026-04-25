@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LwqBmBHuY1c=",
+  "dgSpecHash": "z6wRsTkMm4c=",
   "success": true,
-  "projectFilePath": "/Users/soren/Desktop/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
+  "projectFilePath": "/Users/soren/Desktop/proj/Component-Based-Production-System/CPS_Whisperer/CPS_Whisperer/CPS_Whisperer.csproj",
   "expectedPackageFiles": [
     "/Users/soren/.nuget/packages/microsoft.aspnetcore.openapi/9.0.5/microsoft.aspnetcore.openapi.9.0.5.nupkg.sha512",
     "/Users/soren/.nuget/packages/microsoft.identitymodel.abstractions/8.14.0/microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",

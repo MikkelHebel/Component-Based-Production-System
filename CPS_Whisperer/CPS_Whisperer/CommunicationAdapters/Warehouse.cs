@@ -1,29 +1,8 @@
 using WarehouseReference;
-using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 class Warehouse : ICommunication {
-    public MachineState state {get; set;}
-
-    public int Command(string cmd) {
-        MethodInfo mi = this.GetType().GetMethod(cmd); //substring for parameter(s)?
-        mi.Invoke(this, null); //Invoke the method (null means no parameter for the method call, or you can pass array of parameters)
-        return 0; //return value?
-    }
-
-    public string Status() {
-        return "bich";
-    }
-
-    private void InsertItem(){
-        
-    }
-
-    private void PickItem(){
-        
-    }
-
-    //-----------------------
-
+    private string _inventoryJson;
     private EmulatorServiceClient _client;
 
     private static readonly Lazy<Warehouse> _wh_instance = 
@@ -35,30 +14,46 @@ class Warehouse : ICommunication {
     }
 
     public static Warehouse Instance { get { return _wh_instance.Value; } }
+    
+    public MachineState State {get; set;}
 
-    public async Task Run()
-    {
-        // Just a plain tester for the connection
-        await CheckInventory();
+    public async Task Command(string cmd) {
+        if (cmd.Contains(".")) {
+            int t = Convert.ToInt32(cmd.Substring(0, 1));
+            string n = cmd.Substring(cmd.IndexOf(".")+1);
+            await InsertItem(t,n);
 
-        await InsertItem(1, "ItemA");
+            Console.WriteLine(t + n); //for purpose of showing output, delete
+        }
 
-        await PickItem(1);
+        else {
+            int t = Convert.ToInt32(cmd);
+            await PickItem(t);
+
+            Console.WriteLine(t); //for purpose of showing output, delete
+        }
+        
     }
 
-    async Task CheckInventory() {
+    public string Status() {
         try {
-            Console.WriteLine("Requesting Inventory..."); 
-            string inventoryJson = await _client.GetInventoryAsync(); 
-            Console.WriteLine("Success! Data received:"); 
-            Console.WriteLine(inventoryJson);
+            JObject json = JObject.Parse(_inventoryJson);
+            int s = Convert.ToInt32(json.GetValue("State"));
+            switch (s)
+            {
+                case 0: State = MachineState.Idle; break;
+                case 1: State = MachineState.Executing; break;
+                case 2: State = MachineState.Error; break;
+                default: break;
+            }
+            return State.ToString();
         }
-        catch (Exception ex) {
-            Console.WriteLine($"Error: {ex.Message}");
+        catch (Exception) {
+            return "NO STATE";
         }
     }
 
-    async Task InsertItem(int trayId, string name) {
+    private async Task InsertItem(int trayId, string name) {
         try {
             Console.WriteLine($"Inserting '{name}' into tray {trayId}...");
 
@@ -72,7 +67,7 @@ class Warehouse : ICommunication {
         }
     }
 
-    async Task PickItem(int trayId) {
+    private async Task PickItem(int trayId) {
         try {
             Console.WriteLine($"Picking item from tray {trayId}...");
 
@@ -86,10 +81,32 @@ class Warehouse : ICommunication {
         }
     }
 
+    public async Task CheckInventory() {
+        try {
+            Console.WriteLine("Requesting Inventory..."); 
+            _inventoryJson = await _client.GetInventoryAsync(); 
+            Console.WriteLine("Success! Data received:"); 
+            Console.WriteLine(_inventoryJson);
+        }
+        catch (Exception ex) {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // public async Task Run()
+    // {
+    //     // Just a plain tester for the connection
+    //     await CheckInventory();
+
+    //     await InsertItem(1, "ItemA");
+
+    //     await PickItem(1);
+    // }
+
     //needed?
-    /*public class WarehouseData {
-        public List<Dictionary<string, string>> Inventory { get; set; }
-        public int State { get; set; }
-        public string TimeStamp { get; set; }
-    }*/
+    // public class WarehouseData {
+    //     public List<Dictionary<string, string>> Inventory { get; set; }
+    //     public int State { get; set; }
+    //     public string TimeStamp { get; set; }
+    // }
 }
