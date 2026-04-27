@@ -33,4 +33,8 @@ public class ComponentRegistry
     public IComponent FindAvailable(string type) {
         return _components.Values.FirstOrDefault(c => c.ComponentType == type);
     }
+
+    public List<IComponent> GetAll() {
+        return _components.Values.ToList();
+    }
 }

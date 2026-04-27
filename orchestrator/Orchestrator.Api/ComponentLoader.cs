@@ -7,6 +7,7 @@ public class ComponentLoader : BackgroundService
 {
     private readonly ComponentRegistry _registry;
     private readonly ILogger<ComponentLoader> _logger;
+    private readonly Dictionary<string, IComponent> _pathMap = new();
 
     public ComponentLoader(ComponentRegistry registry, ILogger<ComponentLoader> logger) {
         _registry = registry;
@@ -41,6 +42,7 @@ public class ComponentLoader : BackgroundService
               foreach (var type in types) {
                   if (Activator.CreateInstance(type) is not IComponent component) continue;
                   _registry.Register(component);
+                  _pathMap[path] = component;
               }
 
         } catch (BadImageFormatException ex) {
@@ -53,6 +55,10 @@ public class ComponentLoader : BackgroundService
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e) {
-        _registry.DeRegister(e.FullPath);
+        if (_pathMap.TryGetValue(e.FullPath, out var component))
+        {
+            _registry.DeRegister(component.ComponentId);
+            _pathMap.Remove(e.FullPath);
+        }
     }
 }
