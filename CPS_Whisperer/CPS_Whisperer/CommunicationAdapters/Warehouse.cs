@@ -19,7 +19,7 @@ class Warehouse : ICommunication {
 
     public async Task Command(string cmd) {
         if (cmd.Contains(".")) {
-            int t = Convert.ToInt32(cmd.Substring(0, 1));
+            int t = Convert.ToInt32(cmd.Substring(0, cmd.IndexOf(".")));
             string n = cmd.Substring(cmd.IndexOf(".")+1);
             await InsertItem(t,n);
 
@@ -39,8 +39,7 @@ class Warehouse : ICommunication {
         try {
             JObject json = JObject.Parse(_inventoryJson);
             int s = Convert.ToInt32(json.GetValue("State"));
-            switch (s)
-            {
+            switch (s) {
                 case 0: State = MachineState.Idle; break;
                 case 1: State = MachineState.Executing; break;
                 case 2: State = MachineState.Error; break;

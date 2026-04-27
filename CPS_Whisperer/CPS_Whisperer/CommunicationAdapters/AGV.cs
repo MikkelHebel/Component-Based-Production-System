@@ -31,8 +31,7 @@ class AGV : ICommunication {
     try {
       var obj = JObject.Parse(_jsonString);
       int s = Convert.ToInt32(obj.GetValue("state"));
-      switch (s)
-            {
+      switch (s) {
                 case 0: State = MachineState.Idle; break;
                 case 1: State = MachineState.Executing; break;
                 case 2: State = MachineState.Charging; break;

@@ -55,8 +55,7 @@ class AssemblyStation : ICommunication {
     public string Status() {
         try {
             int s = Convert.ToInt32(JObject.FromObject(_mqttMsg).GetValue("State"));
-            switch (s)
-            {
+            switch (s) {
                 case 0: State = MachineState.Idle; break;
                 case 1: State = MachineState.Executing; break;
                 case 2: State = MachineState.Error; break;
@@ -69,7 +68,7 @@ class AssemblyStation : ICommunication {
         }
     }
 
-    public string CheckHealth() {
+    public string CheckHealth() {        
         if (_health != null){
             return _health;
         }
