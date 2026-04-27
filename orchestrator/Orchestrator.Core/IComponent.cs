@@ -6,6 +6,6 @@ public interface IComponent
     public string ComponentId { get; }
     public string Protocol { get; }
     public string Host { get; }
-    public int Port { get; }
+    public ushort Port { get; }
     public List<CommandDefinition> SupportedCommands { get; }
 }
