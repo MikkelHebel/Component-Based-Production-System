@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CPS_Whisperer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6da0fa0e350ca80bef9b1c5b5f12d6765dba5270")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+313d0c39bfaf0d14f46bc723fc670d71d18a3162")]
 [assembly: System.Reflection.AssemblyProductAttribute("CPS_Whisperer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CPS_Whisperer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

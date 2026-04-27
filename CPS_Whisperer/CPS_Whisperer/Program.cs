@@ -7,12 +7,12 @@ class Program
 
         //------------------------
         Console.WriteLine("\n  Warehouse");
-        await Warehouse.Instance.Command("5.Item 1");
         await Warehouse.Instance.Command("1");
+        await Warehouse.Instance.Command("1.Item 1");
         await Warehouse.Instance.CheckInventory();
 
         //------------------------
-        Console.WriteLine("\n  ASS station");
+        Console.WriteLine("\n  Assembly station");
         await AssemblyStation.Instance.Connect();
         await AssemblyStation.Instance.Subscribe();
 
@@ -23,6 +23,7 @@ class Program
         while (true) {
             Console.ReadLine(); 
             Console.WriteLine("AGV: " + AGV.Instance.Status());
+            Console.WriteLine("Battery: " + AGV.Instance.battery + "%");
             Console.WriteLine("WAREHOUSE: " + Warehouse.Instance.Status());
             Console.WriteLine("ASSEMBLY STATION: " + AssemblyStation.Instance.Status());
             Console.WriteLine("ASSEMBLY STATION HEALTH: " + AssemblyStation.Instance.CheckHealth());

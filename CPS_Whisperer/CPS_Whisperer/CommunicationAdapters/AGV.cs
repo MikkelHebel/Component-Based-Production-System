@@ -2,9 +2,9 @@ using Newtonsoft.Json.Linq;
 
 class AGV : ICommunication {
   private string _jsonString;
+  public int? battery; //eh?
   private HttpClient _client;
-  private static readonly Lazy<AGV> agv_instance =
-    new Lazy<AGV>(() => new AGV());
+  private static readonly Lazy<AGV> agv_instance = new Lazy<AGV>(() => new AGV());
 
   private AGV(){ // singleton 
     _client = new HttpClient();
@@ -13,7 +13,6 @@ class AGV : ICommunication {
   }
   
   public static AGV Instance { get { return agv_instance.Value; } } // get instance of singleton
-  //public int battery; //eh?
   
   public MachineState State {get; set;}
 
@@ -27,10 +26,13 @@ class AGV : ICommunication {
 
   public string Status() {
     UpdateState();
+    UpdateBattery(); //??
+
     
     try {
       var obj = JObject.Parse(_jsonString);
       int s = Convert.ToInt32(obj.GetValue("state"));
+
       switch (s) {
                 case 0: State = MachineState.Idle; break;
                 case 1: State = MachineState.Executing; break;
@@ -66,6 +68,19 @@ class AGV : ICommunication {
     response.EnsureSuccessStatusCode();
 
     return await response.Content.ReadAsStringAsync();
+  }
+
+//Needed??
+  private int? UpdateBattery(){ 
+      try {
+        var obj = JObject.Parse(_jsonString);
+        battery = Convert.ToInt32(obj.GetValue("battery"));
+        return battery;
+      }
+      catch (Exception){
+        battery = null;
+        return battery;
+      } 
   }
 
    // public async Task<string> GetStatus() {

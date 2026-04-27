@@ -11,8 +11,7 @@ class AssemblyStation : ICommunication {
     private MqttFactory _mqttFactory = new MqttFactory();
     private IMqttClient _mqttClient;
     private MqttClientOptions _mqttClientOptions;
-    private static readonly Lazy<AssemblyStation> _as_instance =
-    new Lazy<AssemblyStation>(() => new AssemblyStation());
+    private static readonly Lazy<AssemblyStation> _as_instance = new Lazy<AssemblyStation>(() => new AssemblyStation());
 
     private AssemblyStation(){
         _mqttClient = _mqttFactory.CreateMqttClient();
@@ -21,7 +20,7 @@ class AssemblyStation : ICommunication {
         // Setting up subscriber handler pre connection to ensure no messages are lost
         // Lambda used as an anonymous function. Circumvents defining unnecessary methods elsewhere
         _mqttClient.ApplicationMessageReceivedAsync += e => {
-            _mqttString = e.ApplicationMessage.ConvertPayloadToString();
+            _mqttString = e.ApplicationMessage.ConvertPayloadToString()!;
             //Console.WriteLine(_mqttString);
             UpdateHealth();
 
@@ -118,6 +117,14 @@ class AssemblyStation : ICommunication {
             _health = "Unhealthy";
         }
     }
+
+    public async Task StartAsync()
+    {
+        await Connect();
+        await Subscribe();
+    }
+
+    
 }
 public class MQTTMessage {
     public int ProcessID { get; set; }

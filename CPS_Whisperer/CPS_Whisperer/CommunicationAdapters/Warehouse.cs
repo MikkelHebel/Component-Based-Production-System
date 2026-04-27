@@ -5,8 +5,7 @@ class Warehouse : ICommunication {
     private string _inventoryJson;
     private EmulatorServiceClient _client;
 
-    private static readonly Lazy<Warehouse> _wh_instance = 
-        new Lazy<Warehouse>(() => new Warehouse());
+    private static readonly Lazy<Warehouse> _wh_instance = new Lazy<Warehouse>(() => new Warehouse());
     
     private Warehouse(){
         _client = new EmulatorServiceClient(
