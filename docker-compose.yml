@@ -32,23 +32,23 @@ services:
       - machines
 
   # Web + Database
-  web:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.laravel
-    container_name: web
-    ports:
-      - 8000:8000
-    volumes:
-      - ./webapp:/var/www/html
-      - ./.env:/var/www/html/.env
-    networks:
-      - internal
-      - machines
-    depends_on:
-      - db
-    env_file:
-      - .env
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile.laravel
+  #   container_name: web
+  #   ports:
+  #     - 8000:8000
+  #   volumes:
+  #     - ./webapp:/var/www/html
+  #     - ./.env:/var/www/html/.env
+  #   networks:
+  #     - internal
+  #     - machines
+  #   depends_on:
+  #     - db
+  #   env_file:
+  #     - .env
 
   db:
     image: postgres:18.0
