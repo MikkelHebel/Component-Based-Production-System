@@ -1,3 +1,14 @@
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.doccache
+*.suo
+*.userprefs
+.vs/
+.idea/
+.vscode/
+
 /vendor/
 node_modules/
 npm-debug.log
