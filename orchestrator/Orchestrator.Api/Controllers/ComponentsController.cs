@@ -16,4 +16,11 @@ public class ComponentsController : ControllerBase {
     {
         return Ok(_registry.GetAll());
     }
+
+    [HttpPut("markfree/{componentId}")]
+    public IActionResult MarkFree(string componentId)
+    {
+        _registry.MarkFree(componentId);
+        return Ok();
+    }
 }
