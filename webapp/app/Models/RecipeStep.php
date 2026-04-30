@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RecipeStep extends Model
 {
@@ -12,22 +14,22 @@ class RecipeStep extends Model
         'parameters',
     ];
 
-    public function recipe()
+    public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
 
-    public function batchRecipeStep()
+    public function batchRecipeSteps(): HasMany
     {
         return $this->hasMany(BatchRecipeStep::class);
     }
 
-    public function asset()
+    public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);
     }
 
-    public function recipeItem()
+    public function recipeItems(): HasMany
     {
         return $this->hasMany(RecipeItem::class);
     }

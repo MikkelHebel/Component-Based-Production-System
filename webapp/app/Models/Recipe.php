@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Recipe extends Model
 {
@@ -10,12 +11,12 @@ class Recipe extends Model
        'name',
     ];
 
-    public function recipeSteps()
+    public function recipeSteps(): HasMany
     {
         return $this->hasMany(RecipeStep::class);
     }
 
-    public function batches()
+    public function batches(): HasMany
     {
         return $this->hasMany(Batch::class);
     }

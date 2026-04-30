@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inventory extends Model
 {
@@ -11,12 +12,12 @@ class Inventory extends Model
         'quantity',
     ];
 
-    public function asset()
+    public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);
     }
 
-    public function item()
+    public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
     }

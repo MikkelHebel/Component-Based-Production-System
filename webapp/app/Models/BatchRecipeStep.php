@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BatchRecipeStep extends Pivot
 {
@@ -10,12 +11,12 @@ class BatchRecipeStep extends Pivot
         'status',
     ];
 
-    public function batch()
+    public function batch(): BelongsTo
     {
         return $this->belongsTo(Batch::class);
     }
 
-    public function recipeStep()
+    public function recipeStep(): BelongsTo
     {
         return $this->belongsTo(RecipeStep::class);
     }
