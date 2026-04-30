@@ -30,14 +30,14 @@ services:
     networks:
       - internal
 
-  orchestrator:
-    networks:
-      - mes-network
-
-  whisperer:
-    networks:
-      - mes-network
-      - machines
+  # orchestrator:
+  #   networks:
+  #     - mes-network
+  #
+  # whisperer:
+  #   networks:
+  #     - mes-network
+  #     - machines
 
 volumes:
   pgdata:
