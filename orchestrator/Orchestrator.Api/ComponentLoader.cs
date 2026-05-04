@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using System.Runtime.Loader;
 using Orchestrator.Core;
 namespace Orchestrator.Api;
 
@@ -17,7 +18,7 @@ public class ComponentLoader : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         // FileSystemWatcher watches for creation and deletion of files in components/
         string wd = AppDomain.CurrentDomain.BaseDirectory;
-        string filePath = Path.GetFullPath(System.IO.Path.Combine(wd, @"../../Components/"));
+        string filePath = Path.GetFullPath(System.IO.Path.Combine(wd, @"../../components/"));
         using var watcher = new FileSystemWatcher(filePath);
         
         watcher.NotifyFilter = NotifyFilters.FileName;

@@ -19,7 +19,7 @@ services:
 
   db:
     image: postgres:18.0
-    container_name: Postgres
+    container_name: postgres
     restart: always
     env_file:
       - .env
@@ -30,14 +30,32 @@ services:
     networks:
       - internal
 
-  # orchestrator:
-  #   networks:
-  #     - mes-network
-  #
-  # whisperer:
-  #   networks:
-  #     - mes-network
-  #     - machines
+  orchestrator:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.orchestrator
+    container_name: orchestrator
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+    ports:
+      - 5000:5000
+    volumes:
+      - ./components:/components
+    networks:
+      - mes-network
+
+  whisperer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.whisperer
+    container_name: whisperer
+    environment:
+      - ASPNETCORE_URLS=http://+:5001
+    ports:
+      - 5001:5001
+    networks:
+      - mes-network
+      - machines
 
 volumes:
   pgdata:

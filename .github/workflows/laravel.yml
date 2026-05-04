@@ -28,13 +28,13 @@ jobs:
       - name: Wait for DB to be ready
         run: |
           ATTEMPTS=0
-          until docker exec Postgres pg_isready -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }}; do
+          until docker exec postgres pg_isready -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }}; do
             if [ $ATTEMPTS -ge 15 ]; then
               echo "Timeout: PostgreSQL container failed to start."
-              docker logs Postgres
+              docker logs postgres
               exit 1
             fi
-            echo "Waiting for Postgres... Attempt $((ATTEMPTS + 1))/15"
+            echo "Waiting for postgres... Attempt $((ATTEMPTS + 1))/15"
             sleep 2
             ATTEMPTS=$((ATTEMPTS + 1))
           done
