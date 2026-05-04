@@ -91,21 +91,4 @@ class Warehouse : ICommunication {
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
-
-    // public async Task Run()
-    // {
-    //     // Just a plain tester for the connection
-    //     await CheckInventory();
-
-    //     await InsertItem(1, "ItemA");
-
-    //     await PickItem(1);
-    // }
-
-    //needed?
-    // public class WarehouseData {
-    //     public List<Dictionary<string, string>> Inventory { get; set; }
-    //     public int State { get; set; }
-    //     public string TimeStamp { get; set; }
-    // }
 }

@@ -71,7 +71,7 @@ class AGV : ICommunication {
     return await response.Content.ReadAsStringAsync();
   }
 
-//Needed??
+  //Needed??
   private int? UpdateBattery(){ 
       try {
         var obj = JObject.Parse(_jsonString);
@@ -83,10 +83,4 @@ class AGV : ICommunication {
         return battery;
       } 
   }
-
-   // public async Task<string> GetStatus() {
-  //   using HttpResponseMessage response = await _client.GetAsync("v1/status");
-  //   response.EnsureSuccessStatusCode();
-  //   return await response.Content.ReadAsStringAsync();
-  // }
 }
