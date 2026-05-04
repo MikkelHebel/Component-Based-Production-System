@@ -7,33 +7,41 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.CodeDom.Compiler;
+using System.Diagnostics;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.ServiceModel.Description;
+using System.Threading.Tasks;
+using System.Xml;
 using Newtonsoft.Json.Linq;
 
 namespace WarehouseReference
 {
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WarehouseReference.IEmulatorService")]
+    [GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [ServiceContractAttribute(ConfigurationName="WarehouseReference.IEmulatorService")]
     public interface IEmulatorService
     {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/PickItem", ReplyAction="http://tempuri.org/IEmulatorService/PickItemResponse")]
-        System.Threading.Tasks.Task<string> PickItemAsync(int trayId);
+        [OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/PickItem", ReplyAction="http://tempuri.org/IEmulatorService/PickItemResponse")]
+        Task<string> PickItemAsync(int trayId);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/InsertItem", ReplyAction="http://tempuri.org/IEmulatorService/InsertItemResponse")]
-        System.Threading.Tasks.Task<string> InsertItemAsync(int trayId, string name);
+        [OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/InsertItem", ReplyAction="http://tempuri.org/IEmulatorService/InsertItemResponse")]
+        Task<string> InsertItemAsync(int trayId, string name);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/GetInventory", ReplyAction="http://tempuri.org/IEmulatorService/GetInventoryResponse")]
-        System.Threading.Tasks.Task<string> GetInventoryAsync();
+        [OperationContractAttribute(Action="http://tempuri.org/IEmulatorService/GetInventory", ReplyAction="http://tempuri.org/IEmulatorService/GetInventoryResponse")]
+        Task<string> GetInventoryAsync();
     }
     
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public interface IEmulatorServiceChannel : WarehouseReference.IEmulatorService, System.ServiceModel.IClientChannel
+    [GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    public interface IEmulatorServiceChannel : WarehouseReference.IEmulatorService, IClientChannel
     {
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
-    public partial class EmulatorServiceClient : System.ServiceModel.ClientBase<WarehouseReference.IEmulatorService>, WarehouseReference.IEmulatorService
+    [DebuggerStepThroughAttribute()]
+    [GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    public partial class EmulatorServiceClient : ClientBase<WarehouseReference.IEmulatorService>, WarehouseReference.IEmulatorService
     {
         
         /// <summary>
@@ -41,7 +49,7 @@ namespace WarehouseReference
         /// </summary>
         /// <param name="serviceEndpoint">The endpoint to configure</param>
         /// <param name="clientCredentials">The client credentials</param>
-        static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
+        static partial void ConfigureEndpoint(ServiceEndpoint serviceEndpoint, ClientCredentials clientCredentials);
         
         public EmulatorServiceClient() : 
                 base(EmulatorServiceClient.GetDefaultBinding(), EmulatorServiceClient.GetDefaultEndpointAddress())
@@ -58,80 +66,80 @@ namespace WarehouseReference
         }
         
         public EmulatorServiceClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
-                base(EmulatorServiceClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
+                base(EmulatorServiceClient.GetBindingForEndpoint(endpointConfiguration), new EndpointAddress(remoteAddress))
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
-        public EmulatorServiceClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public EmulatorServiceClient(EndpointConfiguration endpointConfiguration, EndpointAddress remoteAddress) : 
                 base(EmulatorServiceClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
         {
             this.Endpoint.Name = endpointConfiguration.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
         
-        public EmulatorServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public EmulatorServiceClient(Binding binding, EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress)
         {
         }
         
-        public System.Threading.Tasks.Task<string> PickItemAsync(int trayId)
+        public Task<string> PickItemAsync(int trayId)
         {
             return base.Channel.PickItemAsync(trayId);
         }
         
-        public System.Threading.Tasks.Task<string> InsertItemAsync(int trayId, string name)
+        public Task<string> InsertItemAsync(int trayId, string name)
         {
             return base.Channel.InsertItemAsync(trayId, name);
         }
         
-        public System.Threading.Tasks.Task<string> GetInventoryAsync()
+        public Task<string> GetInventoryAsync()
         {
             return base.Channel.GetInventoryAsync();
         }
         
-        public virtual System.Threading.Tasks.Task OpenAsync()
+        public virtual Task OpenAsync()
         {
-            return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
+            return Task.Factory.FromAsync(((ICommunicationObject)(this)).BeginOpen(null, null), new Action<IAsyncResult>(((ICommunicationObject)(this)).EndOpen));
         }
         
         #if !NET6_0_OR_GREATER
-        public virtual System.Threading.Tasks.Task CloseAsync()
+        public virtual Task CloseAsync()
         {
-            return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginClose(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndClose));
+            return Task.Factory.FromAsync(((ICommunicationObject)(this)).BeginClose(null, null), new Action<IAsyncResult>(((ICommunicationObject)(this)).EndClose));
         }
         #endif
         
-        private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
+        private static Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.BasicHttpBinding_IEmulatorService))
             {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                BasicHttpBinding result = new BasicHttpBinding();
                 result.MaxBufferSize = int.MaxValue;
-                result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
+                result.ReaderQuotas = XmlDictionaryReaderQuotas.Max;
                 result.MaxReceivedMessageSize = int.MaxValue;
                 result.AllowCookies = true;
                 return result;
             }
-            throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
+            throw new InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
         
-        private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
+        private static EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
         {
             if ((endpointConfiguration == EndpointConfiguration.BasicHttpBinding_IEmulatorService))
             {
-                return new System.ServiceModel.EndpointAddress("http://localhost:8081/Service.asmx");
+                return new EndpointAddress("http://localhost:8081/Service.asmx");
             }
-            throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
+            throw new InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
         
-        private static System.ServiceModel.Channels.Binding GetDefaultBinding()
+        private static Binding GetDefaultBinding()
         {
             return EmulatorServiceClient.GetBindingForEndpoint(EndpointConfiguration.BasicHttpBinding_IEmulatorService);
         }
         
-        private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
+        private static EndpointAddress GetDefaultEndpointAddress()
         {
             return EmulatorServiceClient.GetEndpointAddress(EndpointConfiguration.BasicHttpBinding_IEmulatorService);
         }

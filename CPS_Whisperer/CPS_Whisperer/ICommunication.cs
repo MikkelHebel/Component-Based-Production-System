@@ -1,5 +1,7 @@
+using System;
+
 interface ICommunication{
-    MachineState State {get; set;} //can't be private
+    public MachineState State { get; set; }
 
     async Task Command(string cmd){}
     //async Task Command(T cmd); //object or something instead of string??
