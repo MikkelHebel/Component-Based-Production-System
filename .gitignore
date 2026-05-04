@@ -39,3 +39,14 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# .NET / ASP.NET build output
+**/bin/
+**/obj/
+*.user
+*.rsuser
+*.suo
+
+# Local keys
+/v2
+/v2.pub
