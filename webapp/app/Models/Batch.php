@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Batch extends Model
 {
@@ -12,17 +14,17 @@ class Batch extends Model
         'priority',
     ];
 
-    public function log()
+    public function logs(): HasMany
     {
         return $this->hasMany(Log::class);
     }
 
-    public function recipe()
+    public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
 
-    public function batchRecipeStep()
+    public function batchRecipeSteps(): HasMany
     {
         return $this->hasMany(BatchRecipeStep::class);
     }

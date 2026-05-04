@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
@@ -11,12 +12,12 @@ class Item extends Model
         'type',
     ];
 
-    public function recipeItem()
+    public function recipeItems(): HasMany
     {
         return $this->hasMany(RecipeItem::class);
     }
 
-    public function inventory()
+    public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
     }

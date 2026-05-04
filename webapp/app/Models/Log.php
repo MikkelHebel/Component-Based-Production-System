@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Log extends Model
 {
@@ -11,12 +12,12 @@ class Log extends Model
         'timestamp',
     ];
 
-    public function asset()
+    public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);
     }
 
-    public function batch()
+    public function batch(): BelongsTo
     {
         return $this->belongsTo(Batch::class);
     }
