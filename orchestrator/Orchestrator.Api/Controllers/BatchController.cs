@@ -19,13 +19,15 @@ public class BatchController : ControllerBase {
     [HttpPost("execute")]
     public async Task<IActionResult> Execute([FromBody] StepCommandDto command) {
         IComponent? component;
+        string componentId;
         lock (_balanceLock) {
             component = _registry.FindAvailable(command.ComponentType);
             if (component == null) return StatusCode(503);
-            _registry.MarkBusy(component.ComponentId);
+            componentId = ComponentHasher.GetId(component);
+            _registry.MarkBusy(componentId);
         }
         WhisperCommandDto whisperCommand = new WhisperCommandDto{
-            ComponentId = component.ComponentId,
+            ComponentId = componentId,
             Protocol = component.Protocol,
             Host = component.Host,
             Port = component.Port,
@@ -33,10 +35,10 @@ public class BatchController : ControllerBase {
             Parameters = command.Parameters
         };
 
-        var client = _client.CreateClient();
-        var response = await client.PostAsJsonAsync("http://whisperer/api/execute", whisperCommand);
+        HttpClient client = _client.CreateClient();
+        HttpResponseMessage response = await client.PostAsJsonAsync("http://whisperer/api/execute", whisperCommand);
         if (!response.IsSuccessStatusCode) {
-            _registry.MarkFree(component.ComponentId);
+            _registry.MarkFree(componentId);
             return StatusCode(502);
         }
         return Ok();

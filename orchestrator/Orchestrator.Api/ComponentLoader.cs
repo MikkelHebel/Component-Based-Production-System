@@ -31,15 +31,15 @@ public class ComponentLoader : BackgroundService
     }
 
     private void OnCreated(object sender, FileSystemEventArgs e) {
-        var path = e.FullPath;
+        string path = e.FullPath;
         try {
               // Load the DLL
-              var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+              Assembly assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
               // Use reflection to search for IComponent implementations
-              var types = assembly.GetTypes().Where(t => typeof(IComponent).IsAssignableFrom(t) && !t.IsInterface);
+              IEnumerable<Type> types = assembly.GetTypes().Where(t => typeof(IComponent).IsAssignableFrom(t) && !t.IsInterface);
 
               // Each type in the DLL that implements IComponent will be added to the component registry
-              foreach (var type in types) {
+              foreach (Type type in types) {
                   if (Activator.CreateInstance(type) is not IComponent component) continue;
                   _registry.Register(component);
                   _pathMap[path] = component;
@@ -55,9 +55,9 @@ public class ComponentLoader : BackgroundService
     }
 
     private void OnDeleted(object sender, FileSystemEventArgs e) {
-        if (_pathMap.TryGetValue(e.FullPath, out var component))
+        if (_pathMap.TryGetValue(e.FullPath, out IComponent? component))
         {
-            _registry.DeRegister(component.ComponentId);
+            _registry.DeRegister(ComponentHasher.GetId(component));
             _pathMap.Remove(e.FullPath);
         }
     }
