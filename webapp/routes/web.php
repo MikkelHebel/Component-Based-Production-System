@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\RecipeController;
 
 Route::get('/', [AuthController::class, 'show'])->name('login');
 Route::post('/', [AuthController::class, 'authenticate'])->name('login.post');
@@ -10,5 +11,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'showDashboard'])->name('dashboard');
+
     Route::get('/config', [DashboardController::class, 'showConfiguration'])->name('config');
+    Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');
 });

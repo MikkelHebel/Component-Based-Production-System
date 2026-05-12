@@ -3,6 +3,18 @@
 @section('main-class', 'flex-1 overflow-hidden flex flex-col p-0')
 
 @section('content')
+    {{-- Notifications --}}
+    @if(session('success'))
+        <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200 shadow-md">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if($errors->has('recipe_name'))
+        <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200 shadow-md">
+            {{ $errors->first('recipe_name') }}
+        </div>
+    @endif
+
     {{-- Header --}}
     <div class="px-6 py-4 border-b bg-white flex items-center gap-3 shrink-0">
         <a href="{{ route('dashboard') }}" class="text-gray-400 hover:text-gray-600 transition-colors p-1 -ml-1 rounded-md">
@@ -33,9 +45,11 @@
     <div class="flex flex-1 overflow-hidden">
         {{-- Sidebar --}}
         <div class="w-72 border-r bg-white flex flex-col overflow-y-auto p-4 gap-3 shrink-0">
-            <input type="text" placeholder="Recipe name" class="input" />
-            <input type="text" placeholder="Product name" class="input" />
-            <button class="btn-dark">+ Add Recipe</button>
+            <form method="POST" action="{{ route('recipe.store') }}">
+                @csrf
+                <input type="text" name="recipe_name" placeholder="Recipe name" class="input" />
+                <button class="btn-dark">+ Add Recipe</button>
+            </form>
         </div>
 
         {{-- Content area --}}
@@ -50,4 +64,3 @@
         </div>
     </div>
 @endsection
-
