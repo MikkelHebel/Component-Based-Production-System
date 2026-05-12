@@ -9,3 +9,15 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    .input {
+        @apply w-full px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50
+               placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    }
+
+    .btn-dark {
+        @apply w-full flex items-center justify-center gap-2 py-2.5 px-4
+               bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer;
+    }
+}
