@@ -5,13 +5,8 @@ namespace App\Http\Controllers;
 
 class DashboardController extends Controller
 {
-    public function showDashboard()
+    public function show()
     {
         return view('dashboard.index');
-    }
-
-    public function showConfiguration()
-    {
-        return view('dashboard.configuration');
     }
 }
