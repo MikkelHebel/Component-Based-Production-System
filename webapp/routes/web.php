@@ -17,5 +17,5 @@ Route::middleware('auth')->group(function() {
     Route::get('/config', [ConfigurationController::class, 'show'])->name('config');
     Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');
     Route::post('/recipeSteps', [RecipeStepController::class, 'store'])->name('recipesteps.store');
-    Route::delete('/recipeSteps', [RecipeStepController::class, 'destroy'])->name('recipesteps.destroy');
+    Route::delete('/recipeSteps/{id}', [RecipeStepController::class, 'destroy'])->name('recipesteps.destroy');
 });

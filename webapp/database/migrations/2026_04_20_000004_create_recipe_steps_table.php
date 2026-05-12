@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained();
             $table->unsignedInteger('step_order');
             $table->string('command');
-            $table->string('parameters');
+            $table->string('parameters')->nullable();
             $table->unique(['recipe_id', 'step_order']);
         });
     }

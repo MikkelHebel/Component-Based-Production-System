@@ -66,7 +66,7 @@
         </div>
 
         {{-- Content area --}}
-        <div class="flex-1 bg-gray-50 overflow-y-auto">
+        <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
             @if(!$selected)
                 <div class="h-full flex items-center justify-center select-none">
                     <div class="text-center">
@@ -78,52 +78,101 @@
                     </div>
                 </div>
             @else
-                <div class="p-8 max-w-2xl">
-                    <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ $selected->name }}</h1>
-                    <p class="text-sm text-gray-500 mb-6">{{ $selected->recipeSteps->count() }} steps</p>
+                {{-- Recipe title bar --}}
+                <div class="bg-white border-b border-gray-200 px-8 py-5 shrink-0">
+                    <h1 class="text-xl font-bold text-gray-900">{{ $selected->name }}</h1>
+                    <p class="text-sm text-gray-400 mt-0.5">{{ $selected->recipeSteps->count() }} steps</p>
+                </div>
 
-                    <div class="flex flex-col gap-3">
+                {{-- Scrollable steps area --}}
+                <div class="flex-1 overflow-y-auto p-8">
+                    <div class="max-w-2xl flex flex-col gap-3">
+
+                        {{-- Existing steps --}}
                         @foreach($selected->recipeSteps as $step)
-                            <div class="bg-white border border-gray-200 rounded-lg p-4">
-                                <div class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Step {{ $step->step_order }}</div>
-                                <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                                    <div>
-                                        <span class="text-gray-400">Component</span>
-                                        <p class="font-medium text-gray-800 mt-0.5">{{ $step->asset->name }}</p>
+                            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0">
+                                            {{ $step->step_order }}
+                                        </span>
+                                        <span class="text-sm font-semibold text-gray-700">Step {{ $step->step_order }}</span>
                                     </div>
-                                    <div>
-                                        <span class="text-gray-400">Command</span>
-                                        <p class="font-medium text-gray-800 mt-0.5">{{ $step->command }}</p>
-                                    </div>
-                                    @if($step->parameters)
-                                        <div class="col-span-2">
-                                            <span class="text-gray-400">Parameters</span>
-                                            <p class="font-medium text-gray-800 mt-0.5">{{ $step->parameters }}</p>
-                                        </div>
-                                    @endif
                                     <form method="POST" action="{{ route('recipesteps.destroy', $step->id) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit">Delete</button>
+                                        <button type="submit" class="text-gray-300 hover:text-red-500 transition-colors cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
                                     </form>
                                 </div>
+                                <div class="px-4 py-4 grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                                    <div>
+                                        <p class="text-xs text-gray-400 mb-0.5">Component</p>
+                                        <p class="font-medium text-gray-800">{{ $step->asset->name }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-400 mb-0.5">Command</p>
+                                        <p class="font-medium text-gray-800">{{ $step->command }}</p>
+                                    </div>
+                                    @if($step->parameters)
+                                        <div class="col-span-2">
+                                            <p class="text-xs text-gray-400 mb-0.5">Parameters</p>
+                                            <p class="font-mono text-xs text-gray-700 bg-gray-50 px-2 py-1.5 rounded-md mt-0.5">{{ $step->parameters }}</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-
-                            <form method="POST" action="{{ route('recipesteps.store') }}">
-                                @csrf
-                                <label>Component</label>
-                                <select name="components" id="components">
-                                    <option value="volvo">AGV</option>
-                                </select>
-                                <label>Command</label>
-                                <select name="command" id="command">
-                                    <option value="agv">AGV</option>
-                                </select>
-                                <label>Parameters</label>
-                                <input type="text">
-                                <button>Add Step</button>
-                            </form>
                         @endforeach
+
+                        {{-- Add step card --}}
+                        <div class="bg-white rounded-xl border-2 border-dashed border-gray-200 overflow-hidden">
+                            <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span class="text-sm font-semibold text-gray-500">New step</span>
+                            </div>
+                            <div class="px-4 py-4 flex flex-col gap-3">
+                                <form method="GET" action="{{ route('config') }}">
+                                    <input type="hidden" name="recipe" value="{{ $selected->id }}">
+                                    <p class="text-xs text-gray-400 mb-1">Component</p>
+                                    <select name="component" onchange="this.form.submit()" class="input">
+                                        <option value="">Select component...</option>
+                                        @foreach($components as $component)
+                                            <option value="{{ $component['componentType'] }}"
+                                                {{ $selectedComponentType === $component['componentType'] ? 'selected' : '' }}>
+                                                {{ $component['componentType'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+
+                                @if($selectedComponentType)
+                                    <form method="POST" action="{{ route('recipesteps.store') }}" class="flex flex-col gap-3">
+                                        @csrf
+                                        <input type="hidden" name="recipe_id" value="{{ $selected->id }}">
+                                        <input type="hidden" name="component" value="{{ $selectedComponentType }}">
+                                        <div>
+                                            <p class="text-xs text-gray-400 mb-1">Command</p>
+                                            <select name="command" class="input">
+                                                @foreach($commands as $command)
+                                                    <option value="{{ $command['name'] }}">{{ $command['name'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-400 mb-1">Parameters</p>
+                                            <input type="text" name="parameters" placeholder="Optional" class="input" />
+                                        </div>
+                                        <button class="btn-dark">+ Add Step</button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             @endif
