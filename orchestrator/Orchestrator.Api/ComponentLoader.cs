@@ -28,6 +28,10 @@ public class ComponentLoader : BackgroundService
 
         watcher.Filter = "*.dll";
         watcher.EnableRaisingEvents = true;
+
+        foreach (string existing in Directory.GetFiles(filePath, "*.dll"))
+            OnCreated(this, new FileSystemEventArgs(WatcherChangeTypes.Created, filePath, Path.GetFileName(existing)));
+
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
