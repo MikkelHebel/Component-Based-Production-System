@@ -15,6 +15,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
+    Route::post('/batches/start', [BatchController::class, 'start'])->name('batches.start');
 
     Route::get('/config', [ConfigurationController::class, 'show'])->name('config');
     Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');

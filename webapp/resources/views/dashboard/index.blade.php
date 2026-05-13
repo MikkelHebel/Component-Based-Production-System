@@ -15,7 +15,10 @@
         <div class="flex items-center gap-2">
             @php $btn = 'px-4 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer'; @endphp
             <button class="{{ $btn }} bg-red-500 hover:bg-red-600 text-white">Stop</button>
-            <button class="{{ $btn }} bg-green-400 hover:bg-green-500 text-white">Start</button>
+            <form method="POST" action="{{ route('batches.start') }}">
+                @csrf
+                <button type="submit" class="{{ $btn }} bg-green-400 hover:bg-green-500 text-white">Start</button>
+            </form>
             <button onclick="document.getElementById('queue-modal').classList.remove('hidden')"
                     class="{{ $btn }} border border-gray-300 hover:bg-gray-50 text-gray-700">Add to queue</button>
             <a href="{{ route('config') }}" class="{{ $btn }} flex items-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700">

@@ -5,40 +5,43 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use App\Models\Batch;
+use App\Models\BatchRecipeStep;
 
 class BatchController extends Controller
 {
 
     public function execute(Request $request) {
-        $pendingSteps = $batch->batchRecipeSteps()
-            ->where('status', 'pending')
-            ->with('recipeStep.asset')
-            ->join('recipe_steps', 'batch_recipe_steps.recipe_step_id', '=', 'recipe_steps.id')
-            ->orderBy('recipe_steps.step_order')
-            ->get();
+        $batch = Batch::findOrFail($request->batch_id);
+
+        $pendingSteps = BatchRecipeStep::where('batch_id', $batch->id)
+            ->where('status', 'In Queue')
+            ->with(['recipeStep' => fn($q) => $q->with('asset')->orderBy('step_order')])
+            ->get()
+            ->sortBy('recipeStep.step_order');
 
         foreach ($pendingSteps as $batchStep) {
             $recipeStep = $batchStep->recipeStep;
 
-            $batchStep->update(['status' => 'in_progress']);
+            $batchStep->update(['status' => 'In Progress']);
 
-            $response = Http::post('http://orchestrator:5001/api/batch/execute', [
-                'batchId' => $batch->id,
-                'recipeStepId' => $recipeStep->id,
-                'componentType' => $recipeStep->asset->name,
-                'command' => $recipeStep->command,
-                'parameters' => $recipeStep->parameters ?? [],
+            $response = Http::post('http://orchestrator:5000/api/batch/execute', [
+                'BatchId' => $batch->id,
+                'RecipeStepId' => $recipeStep->id,
+                'ComponentType' => $recipeStep->asset->name,
+                'Command' => $recipeStep->command,
+                'Parameters' => $recipeStep->parameters ? [$recipeStep->parameters] : [],
             ]);
 
             if ($response->successful()) {
-                $batchStep->update(['status' => 'completed']);
+                $batchStep->update(['status' => 'Done']);
             } else {
-                $batchStep->update(['status' => 'failed']);
+                $batchStep->update(['status' => 'Error']);
                 return response()->json(['error' => 'orchestrator failed on step ' . $recipeStep->id], 500);
             }
         }
 
-        $batch->update(['status' => 'completed']);
-        return response()->json(['status' => 'completed']);
+        $batch->update(['status' => 'Done']);
+        return response()->json(['status' => 'Done']);
     }
 }

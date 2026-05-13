@@ -64,5 +64,6 @@ networks:
   internal:
   mes-network:
   machines:
+    name: machines
     driver: bridge
     attachable: true
