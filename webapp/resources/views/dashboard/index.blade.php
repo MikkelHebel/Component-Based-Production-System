@@ -14,7 +14,10 @@
         </div>
         <div class="flex items-center gap-2">
             @php $btn = 'px-4 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer'; @endphp
-            <button class="{{ $btn }} bg-red-500 hover:bg-red-600 text-white">Stop</button>
+            <form method="POST" action="{{ route('batches.stop') }}">
+                @csrf
+                <button type="submit" class="{{ $btn }} bg-red-500 hover:bg-red-600 text-white">Stop</button>
+            </form>
             <form method="POST" action="{{ route('batches.start') }}">
                 @csrf
                 <button type="submit" class="{{ $btn }} bg-green-400 hover:bg-green-500 text-white">Start</button>
@@ -39,29 +42,55 @@
     <div class="mt-6 grid grid-cols-4 gap-5 pb-20">
 
         {{-- Production Queue --}}
-        <div class="col-span-1 bg-white border border-gray-200 rounded-xl p-5 self-start">
-            <h2 class="font-semibold text-gray-800 mb-5">Production Queue</h2>
+        <div class="col-span-1 space-y-4 self-start">
+            <div class="bg-white border border-gray-200 rounded-xl p-5">
+                <h2 class="font-semibold text-gray-800 mb-5">Production Queue</h2>
 
-            @forelse($activeBatches as $batch)
-                @php $active = $batch->status === 'In Progress'; @endphp
-                <div class="mb-5 last:mb-0">
-                    <div class="flex items-start justify-between gap-2 mb-2">
+                @forelse($activeBatches as $batch)
+                    @php $active = $batch->status === 'In Progress'; @endphp
+                    <div class="mb-5 last:mb-0">
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">{{ $batch->recipe->name }}</p>
+                                <p class="text-xs text-gray-500">{{ number_format($batch->quantity) }} units</p>
+                            </div>
+                            <span class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium {{ $active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
+                                {{ $batch->status }}
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 mb-1">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
+                        </div>
+                        <p class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-400 text-center py-10">No items in queue</p>
+                @endforelse
+            </div>
+
+            {{-- Completed Batches --}}
+            @if($completedBatches->isNotEmpty())
+            <div class="bg-white border border-gray-200 rounded-xl p-5">
+                <h2 class="font-semibold text-gray-800 mb-4">Completed</h2>
+                @foreach($completedBatches as $batch)
+                    @php
+                        $badgeClass = match($batch->status) {
+                            'Done'      => 'bg-green-100 text-green-700',
+                            'Error'     => 'bg-red-100 text-red-700',
+                            'Cancelled' => 'bg-yellow-100 text-yellow-700',
+                            default     => 'bg-gray-100 text-gray-600',
+                        };
+                    @endphp
+                    <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                         <div>
                             <p class="text-sm font-medium text-gray-800">{{ $batch->recipe->name }}</p>
-                            <p class="text-xs text-gray-500">{{ number_format($batch->quantity) }} units</p>
+                            <p class="text-xs text-gray-400">{{ $batch->end_time ? \Carbon\Carbon::parse($batch->end_time)->diffForHumans() : '—' }}</p>
                         </div>
-                        <span class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium {{ $active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
-                            {{ $batch->status }}
-                        </span>
+                        <span class="text-xs px-2 py-0.5 rounded-full font-medium {{ $badgeClass }}">{{ $batch->status }}</span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-2 mb-1">
-                        <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
-                    </div>
-                    <p class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
-                </div>
-            @empty
-                <p class="text-sm text-gray-400 text-center py-10">No items in queue</p>
-            @endforelse
+                @endforeach
+            </div>
+            @endif
         </div>
 
         {{-- Warehouse --}}

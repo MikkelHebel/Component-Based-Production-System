@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use App\Models\Batch;
 use App\Models\BatchRecipeStep;
 use App\Models\RecipeStep;
+use App\Services\BatchExecutionService;
 
 class BatchController extends Controller
 {
@@ -35,7 +35,7 @@ class BatchController extends Controller
         return redirect()->route('dashboard');
     }
 
-    public function start()
+    public function start(BatchExecutionService $executor)
     {
         $batch = Batch::where('status', 'In Queue')
             ->orderBy('priority')
@@ -47,7 +47,23 @@ class BatchController extends Controller
 
         $batch->update(['status' => 'In Progress', 'start_time' => now()]);
 
-        Http::post(url('/api/batch/execute'), ['batch_id' => $batch->id]);
+        $executor->execute($batch->id);
+
+        return redirect()->route('dashboard');
+    }
+
+    public function stop()
+    {
+        $batch = Batch::whereIn('status', ['In Progress', 'In Queue'])
+            ->orderBy('priority')
+            ->first();
+
+        if ($batch) {
+            $batch->update(['status' => 'Cancelled']);
+            BatchRecipeStep::where('batch_id', $batch->id)
+                ->whereIn('status', ['In Queue', 'In Progress'])
+                ->update(['status' => 'Cancelled']);
+        }
 
         return redirect()->route('dashboard');
     }

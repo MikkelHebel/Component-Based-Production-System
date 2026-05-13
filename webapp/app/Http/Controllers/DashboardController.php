@@ -25,6 +25,12 @@ class DashboardController extends Controller
                 return $batch;
             });
 
+        $completedBatches = Batch::with('recipe')
+            ->whereIn('status', ['Done', 'Error', 'Cancelled'])
+            ->orderByDesc('end_time')
+            ->limit(10)
+            ->get();
+
         $inventory = Inventory::with(['item', 'asset'])
             ->orderBy('tray_number')
             ->get()
@@ -41,6 +47,6 @@ class DashboardController extends Controller
         $systemStatus = 'online';
         $recipes = Recipe::all();
 
-        return view('dashboard.index', compact('activeBatches', 'inventory', 'assets', 'systemStatus', 'recipes'));
+        return view('dashboard.index', compact('activeBatches', 'completedBatches', 'inventory', 'assets', 'systemStatus', 'recipes'));
     }
 }

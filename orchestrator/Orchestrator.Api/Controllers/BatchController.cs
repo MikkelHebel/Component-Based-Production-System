@@ -36,9 +36,9 @@ public class BatchController : ControllerBase {
         };
 
         HttpClient client = _client.CreateClient();
-        HttpResponseMessage response = await client.PostAsJsonAsync("http://whisperer/api/execute", whisperCommand);
+        HttpResponseMessage response = await client.PostAsJsonAsync("http://whisperer:5000/api/execute", whisperCommand);
+        _registry.MarkFree(componentId);
         if (!response.IsSuccessStatusCode) {
-            _registry.MarkFree(componentId);
             return StatusCode(502);
         }
         return Ok();

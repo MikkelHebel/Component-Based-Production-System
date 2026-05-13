@@ -13,6 +13,8 @@ class Batch extends Model
         'status',
         'quantity',
         'priority',
+        'start_time',
+        'end_time',
     ];
 
     public function logs(): HasMany
