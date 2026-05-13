@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Inventory extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'tray_number',
         'quantity',

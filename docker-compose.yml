@@ -50,7 +50,7 @@ services:
       dockerfile: docker/Dockerfile.whisperer
     container_name: whisperer
     environment:
-      - ASPNETCORE_URLS=http://+:5001
+      - ASPNETCORE_URLS=http://+:5000
     ports:
       - 5002:5000
     networks:
