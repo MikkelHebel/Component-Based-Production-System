@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeStepController;
+use App\Http\Controllers\BatchController;
 
 Route::get('/', [AuthController::class, 'show'])->name('login');
 Route::post('/', [AuthController::class, 'authenticate'])->name('login.post');
@@ -13,6 +14,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+    Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
 
     Route::get('/config', [ConfigurationController::class, 'show'])->name('config');
     Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');

@@ -7,7 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BatchRecipeStep extends Pivot
 {
+    protected $table = 'batch_recipe_steps';
+    public $timestamps = false;
+
     protected $fillable = [
+        'batch_id',
+        'recipe_step_id',
         'status',
     ];
 

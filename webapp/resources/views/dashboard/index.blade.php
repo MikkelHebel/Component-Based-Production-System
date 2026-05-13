@@ -16,7 +16,8 @@
             @php $btn = 'px-4 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer'; @endphp
             <button class="{{ $btn }} bg-red-500 hover:bg-red-600 text-white">Stop</button>
             <button class="{{ $btn }} bg-green-400 hover:bg-green-500 text-white">Start</button>
-            <button class="{{ $btn }} border border-gray-300 hover:bg-gray-50 text-gray-700">Add to queue</button>
+            <button onclick="document.getElementById('queue-modal').classList.remove('hidden')"
+                    class="{{ $btn }} border border-gray-300 hover:bg-gray-50 text-gray-700">Add to queue</button>
             <a href="{{ route('config') }}" class="{{ $btn }} flex items-center gap-2 border border-gray-300 hover:bg-gray-50 text-gray-700">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -141,6 +142,32 @@
         <span class="text-gray-400" id="last-updated">Last updated: --:--:--</span>
     </div>
 @endsection
+
+{{-- Queue Modal --}}
+<div id="queue-modal" class="hidden fixed inset-0 z-20 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/30" onclick="document.getElementById('queue-modal').classList.add('hidden')"></div>
+    <div class="relative bg-white rounded-xl shadow-xl p-6 w-80 z-30">
+        <h2 class="text-base font-semibold text-gray-900 mb-4">Start Production</h2>
+        <form method="POST" action="{{ route('batches.store') }}">
+            @csrf
+            <label class="block text-xs font-medium text-gray-600 mb-1">Product Preset</label>
+            <select name="recipe_id" required
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled selected>Select a recipe</option>
+                @foreach($recipes as $recipe)
+                    <option value="{{ $recipe->id }}">{{ $recipe->name }}</option>
+                @endforeach
+            </select>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
+            <input type="number" name="quantity" value="1" min="1" required
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button type="submit"
+                    class="w-full bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
+                Queue Production
+            </button>
+        </form>
+    </div>
+</div>
 
 @push('scripts')
 <script>

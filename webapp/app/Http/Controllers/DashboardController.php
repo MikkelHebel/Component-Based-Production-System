@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\Batch;
 use App\Models\Inventory;
+use App\Models\Recipe;
 
 class DashboardController extends Controller
 {
@@ -37,7 +38,8 @@ class DashboardController extends Controller
             $onlineCount > 0 => 'partial',
             default => 'offline',
         };
+        $recipes = Recipe::all();
 
-        return view('dashboard.index', compact('activeBatches', 'inventory', 'assets', 'systemStatus'));
+        return view('dashboard.index', compact('activeBatches', 'inventory', 'assets', 'systemStatus', 'recipes'));
     }
 }

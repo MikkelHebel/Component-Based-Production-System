@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Batch extends Model
 {
     protected $fillable = [
+        'recipe_id',
         'status',
         'quantity',
         'priority',
