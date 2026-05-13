@@ -12,6 +12,8 @@ class RecipeStep extends Model
         'step_order',
         'command',
         'parameters',
+        'asset_id',
+        'recipe_id',
     ];
 
     public function recipe(): BelongsTo

@@ -14,6 +14,6 @@ class ComponentController extends Controller
         if ($response->successful()) {
             return $response->json();
         }
-        return response()->json(['error', => 'C# whisperer unreachable'], 500);
+        return response()->json(['error', => 'Orchestrator failed.'], 500);
     }
 }
