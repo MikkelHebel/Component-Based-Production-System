@@ -17,7 +17,10 @@ class RecipeStepController extends Controller
             'component' => 'required|string',
         ]);
 
-        $asset = Asset::where('name', $request->component)->firstOrFail();
+        $asset = Asset::firstOrCreate(
+            ['name' => $request->component],
+            ['connection_status' => 'unknown']
+        );
         $stepOrder = RecipeStep::where('recipe_id', $request->recipe_id)->max('step_order') + 1;
 
         RecipeStep::create([
@@ -28,7 +31,7 @@ class RecipeStepController extends Controller
             'recipe_id' => $request->recipe_id,
         ]);
 
-        return back()->with('success', 'Recipe Step created.');
+        return redirect()->route('config', ['recipe' => $request->recipe_id])->with('success', 'Recipe Step created.');
     }
 
     public function destroy(int $id)

@@ -9,6 +9,8 @@ class Asset extends Model
 {
     protected $fillable = [
         'name',
+        'connection_status',
+        'last_heartbeat',
     ];
 
     public function recipeSteps(): HasMany

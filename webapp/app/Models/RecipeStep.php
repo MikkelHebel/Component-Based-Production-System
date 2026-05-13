@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RecipeStep extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'step_order',
         'command',
