@@ -9,9 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Batch extends Model
 {
     protected $fillable = [
+        'recipe_id',
         'status',
         'quantity',
         'priority',
+        'start_time',
+        'end_time',
     ];
 
     public function logs(): HasMany
