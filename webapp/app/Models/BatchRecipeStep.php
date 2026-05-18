@@ -13,6 +13,7 @@ class BatchRecipeStep extends Pivot
     protected $fillable = [
         'batch_id',
         'recipe_step_id',
+        'quantity',
         'status',
     ];
 
