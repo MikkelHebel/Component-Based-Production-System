@@ -73,8 +73,10 @@ public class BatchExecutionIntegrationTests
 
         var response = await _orchestrator.PostAsJsonAsync("/api/batch/execute", command);
 
-        // 503 = no component found — chain never started.
-        // 200 or 502 both confirm the orchestrator forwarded to the whisperer.
-        Assert.That((int)response.StatusCode, Is.Not.EqualTo(503));
+        // 502 = orchestrator found component, reached whisperer, whisperer tried the machine
+        //       and failed (machine containers are not running in CI).
+        // 503 would mean no component was found (DLLs not loaded).
+        // 500 would mean orchestrator could not reach the whisperer at all.
+        Assert.That((int)response.StatusCode, Is.EqualTo(502));
     }
 }
