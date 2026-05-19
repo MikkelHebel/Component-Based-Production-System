@@ -17,6 +17,7 @@ Route::middleware('auth')->group(function() {
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
     Route::post('/batches/start', [BatchController::class, 'start'])->name('batches.start');
     Route::post('/batches/stop', [BatchController::class, 'stop'])->name('batches.stop');
+    Route::get('/batches/progress', [BatchController::class, 'progress'])->name('batches.progress');
 
     Route::get('/config', [ConfigurationController::class, 'show'])->name('config');
     Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');

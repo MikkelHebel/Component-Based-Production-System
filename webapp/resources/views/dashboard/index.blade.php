@@ -48,20 +48,21 @@
 
                 @forelse($activeBatches as $batch)
                     @php $active = $batch->status === 'In Progress'; @endphp
-                    <div class="mb-5 last:mb-0">
+                    <div class="mb-5 last:mb-0" data-batch="{{ $batch->id }}">
                         <div class="flex items-start justify-between gap-2 mb-2">
                             <div>
                                 <p class="text-sm font-medium text-gray-800">{{ $batch->recipe->name }}</p>
                                 <p class="text-xs text-gray-500">{{ number_format($batch->quantity) }} units</p>
                             </div>
-                            <span class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium {{ $active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
+                            <span data-status-badge
+                                  class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium {{ $active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600' }}">
                                 {{ $batch->status }}
                             </span>
                         </div>
                         <div class="w-full bg-gray-100 rounded-full h-2 mb-1">
-                            <div class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
+                            <div data-progress-bar class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
                         </div>
-                        <p class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
+                        <p data-progress-text class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400 text-center py-10">No items in queue</p>
@@ -203,7 +204,38 @@
 
 @push('scripts')
 <script>
-    document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
-    setInterval(() => window.location.reload(), 15000);
+    const activeBatchIds = @json($activeBatches->pluck('id'));
+
+    function updateClock() {
+        document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+    }
+    updateClock();
+
+    async function pollProgress() {
+        try {
+            const res = await fetch('{{ route('batches.progress') }}');
+            const batches = await res.json();
+
+            const currentIds = batches.map(b => b.id).sort().join(',');
+            const knownIds   = [...activeBatchIds].sort().join(',');
+
+            if (currentIds !== knownIds) {
+                window.location.reload();
+                return;
+            }
+
+            batches.forEach(batch => {
+                const container = document.querySelector(`[data-batch="${batch.id}"]`);
+                if (!container) return;
+                container.querySelector('[data-progress-bar]').style.width  = batch.progress + '%';
+                container.querySelector('[data-progress-text]').textContent = batch.progress + '% complete';
+                container.querySelector('[data-status-badge]').textContent  = batch.status;
+            });
+
+            updateClock();
+        } catch (_) {}
+    }
+
+    setInterval(pollProgress, 2000);
 </script>
 @endpush
