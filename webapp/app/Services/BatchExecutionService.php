@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Batch;
 use App\Models\BatchRecipeStep;
+use App\Models\Inventory;
 use Illuminate\Support\Facades\Http;
 
 class BatchExecutionService
@@ -34,6 +35,15 @@ class BatchExecutionService
 
             if ($response->successful()) {
                 $batchStep->update(['status' => 'Done']);
+
+                if ($recipeStep->parameters && preg_match('/trayId=(\d+)/i', $recipeStep->parameters, $m)) {
+                    $inventory = Inventory::where('tray_number', (int)$m[1])->first();
+                    if ($inventory) {
+                        stripos($recipeStep->command, 'pick') !== false
+                            ? $inventory->decrement('quantity')
+                            : $inventory->increment('quantity');
+                    }
+                }
             } else {
                 $batchStep->update(['status' => 'Error']);
                 $batch->update(['status' => 'Error']);

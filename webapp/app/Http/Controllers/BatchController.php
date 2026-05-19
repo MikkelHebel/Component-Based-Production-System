@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Batch;
 use App\Models\BatchRecipeStep;
 use App\Models\RecipeStep;
-use App\Services\BatchExecutionService;
+use App\Jobs\RunBatchJob;
 
 class BatchController extends Controller
 {
@@ -24,18 +24,23 @@ class BatchController extends Controller
             'priority' => Batch::max('priority') + 1,
         ]);
 
-        foreach (RecipeStep::where('recipe_id', $request->recipe_id)->get() as $step) {
-            BatchRecipeStep::create([
-                'batch_id'       => $batch->id,
-                'recipe_step_id' => $step->id,
-                'status'         => 'In Queue',
-            ]);
+        $steps = RecipeStep::where('recipe_id', $request->recipe_id)->get();
+
+        for ($unit = 1; $unit <= $batch->quantity; $unit++) {
+            foreach ($steps as $step) {
+                BatchRecipeStep::create([
+                    'batch_id'       => $batch->id,
+                    'recipe_step_id' => $step->id,
+                    'quantity'       => $unit,
+                    'status'         => 'In Queue',
+                ]);
+            }
         }
 
         return redirect()->route('dashboard');
     }
 
-    public function start(BatchExecutionService $executor)
+    public function start()
     {
         $batch = Batch::where('status', 'In Queue')
             ->orderBy('priority')
@@ -46,10 +51,25 @@ class BatchController extends Controller
         }
 
         $batch->update(['status' => 'In Progress', 'start_time' => now()]);
-
-        $executor->execute($batch->id);
+        RunBatchJob::dispatch($batch->id);
 
         return redirect()->route('dashboard');
+    }
+
+    public function progress()
+    {
+        return response()->json(
+            Batch::with('batchRecipeSteps')
+                ->whereIn('status', ['In Progress', 'In Queue'])
+                ->get()
+                ->map(fn($b) => [
+                    'id'       => $b->id,
+                    'status'   => $b->status,
+                    'progress' => $b->batchRecipeSteps->count() > 0
+                        ? (int) round($b->batchRecipeSteps->where('status', 'Done')->count() / $b->batchRecipeSteps->count() * 100)
+                        : 0,
+                ])
+        );
     }
 
     public function stop()

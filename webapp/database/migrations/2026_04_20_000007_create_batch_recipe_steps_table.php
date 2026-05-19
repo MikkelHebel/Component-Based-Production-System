@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('batch_id')->constrained();
             $table->foreignId('recipe_step_id')->constrained();
+            $table->unsignedInteger('quantity')->default(1);
             $table->enum('status', ['Done', 'In Progress', 'In Queue', 'Cancelled', 'Error']);
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
-            $table->unique(['batch_id', 'recipe_step_id']);
+            $table->unique(['batch_id', 'recipe_step_id', 'quantity']);
         });
     }
 
