@@ -44,4 +44,7 @@ echo "[INFO] Creating Pest cache directory..."
 mkdir -p .pest/cache
 chmod 775 .pest/cache
 
+echo "[INFO] Starting queue worker in background..."
+php artisan queue:work --sleep=3 --tries=1 --timeout=600 &
+
 exec php artisan serve --host=0.0.0.0 --port=8000
