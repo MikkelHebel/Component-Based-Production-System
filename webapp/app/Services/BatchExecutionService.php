@@ -37,7 +37,7 @@ class BatchExecutionService
                 $batchStep->update(['status' => 'Done']);
 
                 if ($recipeStep->parameters && preg_match('/trayId=(\d+)/i', $recipeStep->parameters, $m)) {
-                    $inventory = Inventory::where('tray_number', (int)$m[1])->first();
+                    $inventory = Inventory::where('tray_number', (int) $m[1])->first();
                     if ($inventory) {
                         stripos($recipeStep->command, 'pick') !== false
                             ? $inventory->decrement('quantity')
