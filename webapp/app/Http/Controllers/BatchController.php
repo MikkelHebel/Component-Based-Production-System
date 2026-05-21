@@ -63,11 +63,13 @@ class BatchController extends Controller
                 ->whereIn('status', ['In Progress', 'In Queue'])
                 ->get()
                 ->map(fn($b) => [
-                    'id'       => $b->id,
-                    'status'   => $b->status,
+                    'id' => $b->id,
+                    'status' => $b->status,
                     'progress' => $b->batchRecipeSteps->count() > 0
                         ? (int) round($b->batchRecipeSteps->where('status', 'Done')->count() / $b->batchRecipeSteps->count() * 100)
                         : 0,
+                    'current_unit' => $b->batchRecipeSteps->firstWhere('status', 'In Progress')?->quantity,
+                    'total_units' => $b->quantity,
                 ])
         );
     }

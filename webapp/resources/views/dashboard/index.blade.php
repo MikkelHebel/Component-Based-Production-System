@@ -62,7 +62,10 @@
                         <div class="w-full bg-gray-100 rounded-full h-2 mb-1">
                             <div data-progress-bar class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
                         </div>
-                        <p data-progress-text class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span data-unit-text>{{ $batch->quantity > 1 && $batch->current_unit ? 'Unit #'.$batch->current_unit.' of '.$batch->quantity : '' }}</span>
+                            <span data-progress-text>{{ $batch->progress }}% complete</span>
+                        </div>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400 text-center py-10">No items in queue</p>
@@ -260,9 +263,11 @@
             batches.forEach(batch => {
                 const container = document.querySelector(`[data-batch="${batch.id}"]`);
                 if (!container) return;
-                container.querySelector('[data-progress-bar]').style.width  = batch.progress + '%';
+                container.querySelector('[data-progress-bar]').style.width = batch.progress + '%';
                 container.querySelector('[data-progress-text]').textContent = batch.progress + '% complete';
-                container.querySelector('[data-status-badge]').textContent  = batch.status;
+                container.querySelector('[data-status-badge]').textContent = batch.status;
+                const unitEl = container.querySelector('[data-unit-text]');
+                if (unitEl) unitEl.textContent = batch.total_units > 1 && batch.current_unit ? `Unit #${batch.current_unit} of ${batch.total_units}` : '';
             });
 
             updateClock();
