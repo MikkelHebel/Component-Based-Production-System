@@ -129,7 +129,19 @@
                                         <p class="text-xs text-gray-500">{{ $entry->quantity }} units &middot; Tray {{ $entry->tray_number }}</p>
                                     </div>
                                 </div>
-                                <span class="text-xs px-2.5 py-0.5 rounded-full font-medium border {{ $badgeClass }}">{{ $label }}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full font-medium border {{ $badgeClass }}">{{ $label }}</span>
+                                    <form method="POST" action="{{ route('inventory.destroy', $entry->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Remove from warehouse"
+                                            class="text-gray-300 hover:text-red-500 transition-colors cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -137,6 +149,27 @@
             @empty
                 <p class="text-sm text-gray-400 text-center py-10">No inventory data available</p>
             @endforelse
+
+            {{-- Add item --}}
+            <details class="mt-4 group">
+                <summary class="flex items-center gap-1.5 text-sm font-medium text-green-600 hover:text-green-700 cursor-pointer list-none select-none">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add item
+                </summary>
+                <form method="POST" action="{{ route('inventory.store') }}" class="mt-3 flex flex-col gap-2">
+                    @csrf
+                    <input type="text" name="name" placeholder="Item name" class="input" required />
+                    <select name="type" class="input" required>
+                        <option value="part">Part</option>
+                        <option value="product">Product</option>
+                    </select>
+                    <input type="number" name="tray_number" placeholder="Tray number" class="input" required min="1" />
+                    <input type="number" name="quantity" placeholder="Quantity" class="input" required min="0" />
+                    <button type="submit" class="btn-dark">Add to warehouse</button>
+                </form>
+            </details>
         </div>
     </div>
 @endsection

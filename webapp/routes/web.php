@@ -7,6 +7,7 @@ use App\Http\Controllers\ConfigurationController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeStepController;
 use App\Http\Controllers\BatchController;
+use App\Http\Controllers\InventoryController;
 
 Route::get('/', [AuthController::class, 'show'])->name('login');
 Route::post('/', [AuthController::class, 'authenticate'])->name('login.post');
@@ -18,6 +19,9 @@ Route::middleware('auth')->group(function() {
     Route::post('/batches/start', [BatchController::class, 'start'])->name('batches.start');
     Route::post('/batches/stop', [BatchController::class, 'stop'])->name('batches.stop');
     Route::get('/batches/progress', [BatchController::class, 'progress'])->name('batches.progress');
+
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+    Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
 
     Route::get('/config', [ConfigurationController::class, 'show'])->name('config');
     Route::post('/recipe', [RecipeController::class, 'store'])->name('recipe.store');

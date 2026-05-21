@@ -10,6 +10,8 @@ class Inventory extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'item_id',
+        'asset_id',
         'tray_number',
         'quantity',
     ];
