@@ -15,7 +15,7 @@ class RecipeSeeder extends Seeder
         $agv             = Asset::firstOrCreate(['name' => 'AGV'],             ['connection_status' => 'unknown']);
         $assemblyStation = Asset::firstOrCreate(['name' => 'AssemblyStation'], ['connection_status' => 'unknown']);
 
-        $recipe = Recipe::firstOrCreate(['name' => 'Drone Assembly']);
+        $recipe = Recipe::firstOrCreate(['name' => 'Drone']);
 
         $steps = [
             ['asset' => $warehouse,       'command' => 'PickItem',                'parameters' => 'trayId=1'],

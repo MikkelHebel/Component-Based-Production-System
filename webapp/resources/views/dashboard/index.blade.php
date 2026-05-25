@@ -62,7 +62,10 @@
                         <div class="w-full bg-gray-100 rounded-full h-2 mb-1">
                             <div data-progress-bar class="bg-blue-500 h-2 rounded-full" style="width: {{ $batch->progress }}%"></div>
                         </div>
-                        <p data-progress-text class="text-right text-xs text-gray-400">{{ $batch->progress }}% complete</p>
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span data-unit-text>{{ $batch->quantity > 1 && $batch->current_unit ? 'Unit #'.$batch->current_unit.' of '.$batch->quantity : '' }}</span>
+                            <span data-progress-text>{{ $batch->progress }}% complete</span>
+                        </div>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400 text-center py-10">No items in queue</p>
@@ -129,7 +132,19 @@
                                         <p class="text-xs text-gray-500">{{ $entry->quantity }} units &middot; Tray {{ $entry->tray_number }}</p>
                                     </div>
                                 </div>
-                                <span class="text-xs px-2.5 py-0.5 rounded-full font-medium border {{ $badgeClass }}">{{ $label }}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs px-2.5 py-0.5 rounded-full font-medium border {{ $badgeClass }}">{{ $label }}</span>
+                                    <form method="POST" action="{{ route('inventory.destroy', $entry->id) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" title="Remove from warehouse"
+                                            class="text-gray-300 hover:text-red-500 transition-colors cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endforeach
                     </div>
@@ -137,6 +152,27 @@
             @empty
                 <p class="text-sm text-gray-400 text-center py-10">No inventory data available</p>
             @endforelse
+
+            {{-- Add item --}}
+            <details class="mt-4 group">
+                <summary class="flex items-center gap-1.5 text-sm font-medium text-green-600 hover:text-green-700 cursor-pointer list-none select-none">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add item
+                </summary>
+                <form method="POST" action="{{ route('inventory.store') }}" class="mt-3 flex flex-col gap-2">
+                    @csrf
+                    <input type="text" name="name" placeholder="Item name" class="input" required />
+                    <select name="type" class="input" required>
+                        <option value="part">Part</option>
+                        <option value="product">Product</option>
+                    </select>
+                    <input type="number" name="tray_number" placeholder="Tray number" class="input" required min="1" />
+                    <input type="number" name="quantity" placeholder="Quantity" class="input" required min="0" />
+                    <button type="submit" class="btn-dark">Add to warehouse</button>
+                </form>
+            </details>
         </div>
     </div>
 @endsection
@@ -227,9 +263,11 @@
             batches.forEach(batch => {
                 const container = document.querySelector(`[data-batch="${batch.id}"]`);
                 if (!container) return;
-                container.querySelector('[data-progress-bar]').style.width  = batch.progress + '%';
+                container.querySelector('[data-progress-bar]').style.width = batch.progress + '%';
                 container.querySelector('[data-progress-text]').textContent = batch.progress + '% complete';
-                container.querySelector('[data-status-badge]').textContent  = batch.status;
+                container.querySelector('[data-status-badge]').textContent = batch.status;
+                const unitEl = container.querySelector('[data-unit-text]');
+                if (unitEl) unitEl.textContent = batch.total_units > 1 && batch.current_unit ? `Unit #${batch.current_unit} of ${batch.total_units}` : '';
             });
 
             updateClock();

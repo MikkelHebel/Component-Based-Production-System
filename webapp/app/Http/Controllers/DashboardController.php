@@ -22,6 +22,7 @@ class DashboardController extends Controller
                 $total = $batch->batchRecipeSteps->count();
                 $done = $batch->batchRecipeSteps->where('status', 'Done')->count();
                 $batch->progress = $total > 0 ? (int) round($done / $total * 100) : 0;
+                $batch->current_unit = $batch->batchRecipeSteps->firstWhere('status', 'In Progress')?->quantity;
                 return $batch;
             });
 

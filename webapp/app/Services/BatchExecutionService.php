@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Asset;
 use App\Models\Batch;
 use App\Models\BatchRecipeStep;
 use App\Models\Inventory;
+use App\Models\Item;
 use Illuminate\Support\Facades\Http;
 
 class BatchExecutionService
@@ -17,7 +19,7 @@ class BatchExecutionService
             ->where('status', 'In Queue')
             ->with(['recipeStep' => fn($q) => $q->with('asset')->orderBy('step_order')])
             ->get()
-            ->sortBy('recipeStep.step_order');
+            ->sortBy(fn($brs) => [$brs->quantity, $brs->recipeStep->step_order]);
 
         foreach ($pendingSteps as $batchStep) {
             if ($batch->fresh()->status === 'Cancelled') break;
@@ -44,6 +46,14 @@ class BatchExecutionService
                             : $inventory->increment('quantity');
                     }
                 }
+
+                // When all steps for this unit are done, add one finished product to the warehouse
+                $unitNumber = $batchStep->quantity;
+                $totalForUnit = BatchRecipeStep::where('batch_id', $batch->id)->where('quantity', $unitNumber)->count();
+                $doneForUnit = BatchRecipeStep::where('batch_id', $batch->id)->where('quantity', $unitNumber)->where('status', 'Done')->count();
+                if ($doneForUnit === $totalForUnit) {
+                    $this->storeFinishedProduct($batch);
+                }
             } else {
                 $batchStep->update(['status' => 'Error']);
                 $batch->update(['status' => 'Error']);
@@ -53,6 +63,33 @@ class BatchExecutionService
 
         if ($batch->fresh()->status !== 'Cancelled') {
             $batch->update(['status' => 'Done', 'end_time' => now()]);
+        }
+    }
+
+    private function storeFinishedProduct(Batch $batch): void
+    {
+        $warehouse = Asset::where('name', 'Warehouse')->first();
+        if (!$warehouse) return;
+
+        $product = Item::firstOrCreate(
+            ['name' => $batch->recipe->name],
+            ['type' => 'product'],
+        );
+
+        $inventory = Inventory::where('item_id', $product->id)
+            ->where('asset_id', $warehouse->id)
+            ->first();
+
+        if ($inventory) {
+            $inventory->increment('quantity');
+        } else {
+            $nextTray = (Inventory::max('tray_number') ?? 0) + 1;
+            Inventory::create([
+                'item_id'     => $product->id,
+                'asset_id'    => $warehouse->id,
+                'tray_number' => $nextTray,
+                'quantity'    => 1,
+            ]);
         }
     }
 }
